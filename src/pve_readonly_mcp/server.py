@@ -9,7 +9,7 @@ from pve_readonly_mcp.pve_client import PveClient, PveError
 mcp = MCPServer(
     "pve-readonly",
     version="0.1.0",
-    instructions="Nur lesender Zugriff auf einen Proxmox-VE-Host. Keine Änderungen möglich.",
+    instructions="Read-only access to a Proxmox VE host. No changes are possible.",
 )
 
 GIB = 1024**3
@@ -38,7 +38,7 @@ def _guests() -> list[dict]:
 
 @mcp.tool()
 def list_nodes() -> list[dict]:
-    """Listet alle Proxmox-Knoten mit Status, CPU-Last, RAM-Nutzung und Uptime."""
+    """List all Proxmox nodes with status, CPU load, memory usage and uptime."""
     return [
         {
             "node": n["node"],
@@ -54,9 +54,9 @@ def list_nodes() -> list[dict]:
 
 @mcp.tool()
 def list_guests(node: str | None = None, status: str | None = None) -> list[dict]:
-    """Listet VMs (qemu) und Container (lxc).
+    """List virtual machines (qemu) and containers (lxc).
 
-    Optional gefiltert nach Knoten und Status ('running' oder 'stopped').
+    Optionally filtered by node and status ('running' or 'stopped').
     """
     result = []
     for g in _guests():
@@ -79,10 +79,10 @@ def list_guests(node: str | None = None, status: str | None = None) -> list[dict
 
 @mcp.tool()
 def get_guest_status(vmid: int) -> dict:
-    """Aktueller Status einer VM bzw. eines Containers: CPU, RAM, Uptime."""
+    """Current status of a VM or container: CPU, memory, uptime."""
     guest = next((g for g in _guests() if g.get("vmid") == vmid), None)
     if guest is None:
-        raise ToolError(f"Kein Gast mit VMID {vmid} gefunden")
+        raise ToolError(f"No guest with VMID {vmid} found")
     st = _call(f"/nodes/{guest['node']}/{guest['type']}/{vmid}/status/current")
     return {
         "vmid": vmid,

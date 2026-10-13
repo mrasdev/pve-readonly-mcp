@@ -4,7 +4,7 @@ import httpx
 
 
 class PveError(Exception):
-    """Fehler beim Zugriff auf die Proxmox-API."""
+    """Error while accessing the Proxmox API."""
 
 
 class PveClient:
@@ -31,8 +31,8 @@ class PveClient:
             r.raise_for_status()
         except httpx.HTTPStatusError as e:
             raise PveError(
-                f"Proxmox-API: HTTP {e.response.status_code} bei {path}"
+                f"Proxmox API: HTTP {e.response.status_code} for {path}"
             ) from e
         except httpx.HTTPError as e:
-            raise PveError(f"Proxmox-API nicht erreichbar: {e}") from e
-        return r.json()["data"]  # Proxmox verpackt alles in {"data": ...}
+            raise PveError(f"Proxmox API unreachable: {e}") from e
+        return r.json()["data"]  # Proxmox wraps every response in {"data": ...}

@@ -1,4 +1,4 @@
-"""Testet den Server so, wie ein MCP-Client ihn sieht (in-process, ohne stdio)."""
+"""Test the server the way an MCP client sees it (in-process, no stdio)."""
 
 import pytest
 from mcp import Client

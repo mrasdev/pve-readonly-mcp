@@ -4,8 +4,8 @@ import pytest
 from pve_readonly_mcp import server
 from pve_readonly_mcp.pve_client import PveClient
 
-# Antworten nach Proxmox-API-Doku (Ausschnitt). Beim Echttest mit
-# `pvesh get <pfad> --output-format json` gegenpruefen.
+# Responses based on the Proxmox API documentation (excerpt). Verify against
+# a real host with `pvesh get <path> --output-format json`.
 FAKE_API = {
     "/api2/json/nodes": [
         {
@@ -49,7 +49,7 @@ FAKE_API = {
 
 def fake_handler(request: httpx.Request) -> httpx.Response:
     assert request.headers["Authorization"] == "PVEAPIToken=test@pve!ro=secret"
-    assert request.method == "GET"  # read-only: nie etwas anderes als GET
+    assert request.method == "GET"  # read-only: never anything other than GET
     data = FAKE_API.get(request.url.path)
     if data is None:
         return httpx.Response(404, json={"data": None})

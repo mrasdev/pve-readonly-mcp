@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 @dataclass(frozen=True)
 class Settings:
-    url: str  # z. B. https://pve.local:8006
-    token_id: str  # z. B. mcp@pve!readonly
+    url: str  # e.g. https://pve.local:8006
+    token_id: str  # e.g. mcp@pve!readonly
     token_secret: str
     ca_file: str | None = None
 
@@ -17,7 +17,8 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    load_dotenv(override=False)  # .env optional; echte Umgebungsvariablen gewinnen
+    # .env is optional; real environment variables take precedence
+    load_dotenv(override=False)
     try:
         return Settings(
             url=os.environ["PVE_URL"],
@@ -26,4 +27,4 @@ def load_settings() -> Settings:
             ca_file=os.environ.get("PVE_CA_FILE"),
         )
     except KeyError as e:
-        raise RuntimeError(f"Umgebungsvariable {e.args[0]} fehlt") from None
+        raise RuntimeError(f"Environment variable {e.args[0]} is not set") from None

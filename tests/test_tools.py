@@ -44,5 +44,5 @@ def test_missing_config(monkeypatch):
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setattr("pve_readonly_mcp.config.load_dotenv", lambda **kw: None)
     server.get_client.cache_clear()
-    with pytest.raises(ToolError, match="PVE_URL fehlt"):
+    with pytest.raises(ToolError, match="PVE_URL is not set"):
         server.list_nodes()

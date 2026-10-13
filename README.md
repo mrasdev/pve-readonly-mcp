@@ -6,7 +6,7 @@ Claude answer typical admin questions about a Proxmox host — *"Is a storage ru
 *"Which guests have no recent backup?"*, *"What failed this week?"* — without being able to change
 anything.
 
-![CI](https://github.com/mrasdev/pve-readonly-mcp/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/mrasdev/pve-readonly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/mrasdev/pve-readonly-mcp/actions/workflows/ci.yml)
 
 ## What is MCP?
 

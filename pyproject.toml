@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pve-readonly-mcp"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["mcp[cli]>=2,<3", "httpx"]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[project.scripts]
+pve-readonly-mcp = "pve_readonly_mcp.server:main"

@@ -12,7 +12,7 @@ async def test_tools_are_listed():
     async with Client(mcp) as client:
         result = await client.list_tools()
     names = {t.name for t in result.tools}
-    assert names == {"list_nodes", "list_guests", "get_guest_status"}
+    assert names == {"list_nodes", "list_guests", "get_guest_status", "list_storage"}
 
 
 async def test_call_tool(fake_client):

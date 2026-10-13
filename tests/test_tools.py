@@ -46,3 +46,45 @@ def test_missing_config(monkeypatch):
     server.get_client.cache_clear()
     with pytest.raises(ToolError, match="PVE_URL is not set"):
         server.list_nodes()
+
+
+def test_storage_values(fake_client):
+    storages = server.list_storage()
+    local = next(s for s in storages if s["storage"] == "local")
+    assert local == {
+        "storage": "local",
+        "type": "dir",
+        "node": "pve",
+        "status": "available",
+        "shared": False,
+        "total_gib": 100.0,
+        "used_gib": 25.0,
+        "free_gib": 75.0,
+        "used_percent": 25.0,
+    }
+
+
+def test_storage_sorting(fake_client):
+    storages = server.list_storage()
+    assert [s["storage"] for s in storages] == ["local-lvm", "local", "nas"]
+
+
+def test_storage_filter_node(fake_client):
+    assert len(server.list_storage(node="pve")) == 3
+    assert server.list_storage(node="unknown") == []
+
+
+def test_storage_missing_size(fake_client):
+    storages = server.list_storage()
+    nas = next(s for s in storages if s["storage"] == "nas")
+    assert nas == {
+        "storage": "nas",
+        "type": "nfs",
+        "node": "pve",
+        "status": "unknown",
+        "shared": True,
+        "total_gib": 0.0,
+        "used_gib": 0.0,
+        "free_gib": 0.0,
+        "used_percent": 0.0,
+    }

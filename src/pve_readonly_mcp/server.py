@@ -36,6 +36,10 @@ def _guests() -> list[dict]:
     return _call("/cluster/resources", {"type": "vm"})
 
 
+def _storages() -> list[dict]:
+    return _call("/cluster/resources", {"type": "storage"})
+
+
 @mcp.tool()
 def list_nodes() -> list[dict]:
     """List all Proxmox nodes with status, CPU load, memory usage and uptime."""
@@ -96,6 +100,32 @@ def get_guest_status(vmid: int) -> dict:
         "mem_total_gib": _gib(st.get("maxmem")),
         "uptime_s": st.get("uptime", 0),
     }
+
+
+@mcp.tool()
+def list_storage(node: str | None = None) -> list[dict]:
+    """Storage of one or all nodes: total, used, free, type, status, shared."""
+    result = []
+    for s in _storages():
+        if node and s.get("node") != node:
+            continue
+        maxdisk_b = s.get("maxdisk") or 0
+        disk_b = s.get("disk") or 0
+        used_pct = round(disk_b / maxdisk_b * 100, 1) if maxdisk_b else 0.0
+        result.append(
+            {
+                "storage": s["storage"],
+                "node": s.get("node"),
+                "type": s.get("plugintype"),
+                "status": s.get("status"),
+                "shared": bool(s.get("shared", 0)),
+                "total_gib": _gib(maxdisk_b),
+                "used_gib": _gib(disk_b),
+                "free_gib": _gib(maxdisk_b - disk_b),
+                "used_percent": used_pct,
+            }
+        )
+    return sorted(result, key=lambda s: s["used_percent"], reverse=True)
 
 
 def main() -> None:

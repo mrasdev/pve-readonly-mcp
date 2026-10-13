@@ -34,6 +34,34 @@ FAKE_API = {
             "status": "stopped",
             "template": 0,
         },
+        {
+            "type": "storage",
+            "storage": "local",
+            "plugintype": "dir",
+            "node": "pve",
+            "status": "available",
+            "shared": 0,
+            "maxdisk": 100 * 1024**3,
+            "disk": 25 * 1024**3,
+        },
+        {
+            "type": "storage",
+            "storage": "local-lvm",
+            "plugintype": "lvmthin",
+            "node": "pve",
+            "status": "available",
+            "shared": 0,
+            "maxdisk": 200 * 1024**3,
+            "disk": 150 * 1024**3,
+        },
+        {
+            "type": "storage",
+            "storage": "nas",
+            "plugintype": "nfs",
+            "node": "pve",
+            "status": "unknown",
+            "shared": 1,
+        },
     ],
     "/api2/json/nodes/pve/lxc/101/status/current": {
         "name": "prometheus",
@@ -46,6 +74,8 @@ FAKE_API = {
     },
 }
 
+RESOURCE_TYPES = {"vm": {"qemu", "lxc"}, "storage": {"storage"}}
+
 
 def fake_handler(request: httpx.Request) -> httpx.Response:
     assert request.headers["Authorization"] == "PVEAPIToken=test@pve!ro=secret"
@@ -53,11 +83,15 @@ def fake_handler(request: httpx.Request) -> httpx.Response:
     data = FAKE_API.get(request.url.path)
     if data is None:
         return httpx.Response(404, json={"data": None})
+    if request.url.path == "/api2/json/cluster/resources":
+        # intentionally strict: missing type will raise KeyError
+        wanted = RESOURCE_TYPES[request.url.params.get("type")]
+        data = [r for r in data if r["type"] in wanted]
     return httpx.Response(200, json={"data": data})
 
 
 @pytest.fixture
-def fake_client(monkeypatch):
+def fake_client(monkeypatch: pytest.MonkeyPatch):
     client = PveClient(
         "https://pve.test:8006/api2/json",
         "test@pve!ro",
